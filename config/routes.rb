@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resources :slots, only: %i[index create] do
+  resources :slots, only: %i[create] do
     get :booked_slots, on: :collection
   end
 

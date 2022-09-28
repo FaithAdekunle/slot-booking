@@ -1,8 +1,8 @@
-import ReactOnRails from 'react-on-rails';
+import ReactOnRails from "react-on-rails";
 
-import HelloWorld from '../bundles/HelloWorld/components/HelloWorldServer';
+import Slots from "../bundles/Slots/components/SlotsServer";
 
-// This is how react_on_rails can see the HelloWorld in the browser.
+// This is how react_on_rails can see the Slots in the browser.
 ReactOnRails.register({
-  HelloWorld,
+  Slots
 });
