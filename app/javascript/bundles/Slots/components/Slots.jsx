@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useState, useEffect, useCallback } from "react";
 
+import PickDay from "./PickDay";
 import style from "./Slots.module.css";
 
 const INTERVAL_MINS = 15;
@@ -15,16 +16,15 @@ const Slots = () => {
     axios
       .get("/slots/booked_slots", {
         params: {
-          // date: slotDate,
-          date: new Date(),
-          interval_mins: INTERVAL_MINS
+          interval_mins: INTERVAL_MINS,
+          date: slotDate.toDateString()
         }
       })
       .then(data => {
         setBookedSlots(data.data.slots);
       })
       .finally(() => setLoadingBookedSlots(false));
-  }, []);
+  }, [slotDate]);
 
   useEffect(() => {
     if (slotDate) {
@@ -41,7 +41,11 @@ const Slots = () => {
 
   return (
     <div className="container">
-      <h3>Slots React</h3>
+      <PickDay
+        slotDate={slotDate}
+        setSlotDate={setSlotDate}
+        disabled={loadingBookedSlots}
+      />
     </div>
   );
 };
