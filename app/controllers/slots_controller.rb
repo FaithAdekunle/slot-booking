@@ -12,6 +12,9 @@ class SlotsController < ApplicationController
   end
 
   def booked_slots
-    render(json: BookedSlotsService.new.find_booked_slots(params[:date], params[:interval_mins]), status: :ok)
+    render(
+      status: :ok,
+      json: { slots: BookedSlotsService.new.find_booked_slots(Date.parse(params[:date]), params[:interval_mins].to_i) }
+    )
   end
 end
