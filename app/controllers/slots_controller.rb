@@ -9,7 +9,7 @@ class SlotsController < ApplicationController
     head :no_content, status: :created
   end
 
-  def available_slots
-    render json: AvailableSlotsService.new.find_available_slots(params[:date]), status: :ok
+  def booked_slots
+    render json: BookedSlotsService.new.find_booked_slots(params[:date]), status: :ok
   end
 end
