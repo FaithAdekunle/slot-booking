@@ -1,10 +1,11 @@
 import axios from "axios";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 
 import PickDay from "./PickDay";
-import style from "./Slots.module.css";
+import PickDuration from "./PickDuration";
+import { getAvailableSlots } from "../../../lib/slots";
 
-const INTERVAL_MINS = 15;
+import style from "./Slots.module.css";
 
 const Slots = () => {
   const [slotDate, setSlotDate] = useState();
@@ -16,7 +17,6 @@ const Slots = () => {
     axios
       .get("/slots/booked_slots", {
         params: {
-          interval_mins: INTERVAL_MINS,
           date: slotDate.toDateString()
         }
       })
@@ -37,10 +37,23 @@ const Slots = () => {
     if (loadingBookedSlots) loadBookedSlots();
   }, [loadingBookedSlots, loadBookedSlots]);
 
-  console.log(bookedSlots);
+  const availableSlots = useMemo(() => {
+    if (bookedSlots && slotDuration) {
+      return getAvailableSlots(slotDuration.value, bookedSlots);
+    }
+  }, [bookedSlots, slotDuration]);
+
+  console.log(bookedSlots, availableSlots);
 
   return (
     <div className="container">
+      <PickDuration
+        slotDuration={slotDuration}
+        setSlotDuration={setSlotDuration}
+      />
+      <br />
+      <hr />
+      <br />
       <PickDay
         slotDate={slotDate}
         setSlotDate={setSlotDate}

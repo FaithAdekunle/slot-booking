@@ -9,7 +9,7 @@ const PickDay = ({ slotDate, setSlotDate, disabled }) => {
   const footer = useMemo(() => {
     return (
       <>
-        <hr />
+        <br />
         {slotDate ? (
           <p>You picked {format(slotDate, "PP")}.</p>
         ) : (

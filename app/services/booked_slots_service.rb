@@ -1,5 +1,7 @@
 class BookedSlotsService
-  def find_booked_slots(date, interval_mins)
+  INTERVAL_MINS = 15
+
+  def find_booked_slots(date)
     slots = Slot.where(start_time: date.all_day)
 
     slots.each_with_object({}) do |slot, booked_slots|
@@ -8,7 +10,7 @@ class BookedSlotsService
 
       while start_time < end_time
         booked_slots["#{start_time.hour}:#{start_time.min}"] = true
-        start_time += interval_mins.minutes
+        start_time += INTERVAL_MINS.minutes
       end
     end
   end
