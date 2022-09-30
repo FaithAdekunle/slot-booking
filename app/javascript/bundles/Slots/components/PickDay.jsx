@@ -11,7 +11,7 @@ const PickDay = ({ slotDate, setSlotDate, disabled }) => {
       <>
         <br />
         {slotDate ? (
-          <p>You picked {format(slotDate, "PP")}.</p>
+          <p>{format(slotDate, "PP")}.</p>
         ) : (
           <p>Please pick a day.</p>
         )}
