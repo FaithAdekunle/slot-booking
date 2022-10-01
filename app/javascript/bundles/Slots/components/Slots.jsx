@@ -1,5 +1,12 @@
+import React, {
+  useRef,
+  useMemo,
+  useState,
+  useEffect,
+  useCallback
+} from "react";
 import axios from "axios";
-import React, { useMemo, useState, useEffect, useCallback } from "react";
+import ActionCable from "actioncable";
 
 import PickDay from "./PickDay";
 import PickSlot from "./PickSlot";
@@ -9,12 +16,16 @@ import { getAvailableSlots, INTERVAL_MINS } from "../../../lib/slots";
 import style from "./Slots.module.css";
 
 const Slots = () => {
+  const cableSubscription = useRef();
+
   const [slotDate, setSlotDate] = useState();
   const [booking, setBooking] = useState(false);
   const [bookedSlots, setBookedSlots] = useState();
   const [selectedSlot, setSelectedSlot] = useState();
   const [slotDuration, setSlotDuration] = useState();
   const [loadingBookedSlots, setLoadingBookedSlots] = useState(false);
+
+  const cable = useMemo(() => ActionCable.createConsumer("/cable"), []);
 
   const loadBookedSlots = useCallback(() => {
     axios
@@ -30,6 +41,23 @@ const Slots = () => {
       .catch(error => console.log(error))
       .finally(() => setLoadingBookedSlots(false));
   }, [slotDate]);
+
+  useEffect(() => {
+    if (slotDate) {
+      cableSubscription.current?.unsubscribe();
+      cableSubscription.current = cable.subscriptions.create(
+        {
+          channel: "SlotDateChannel",
+          date: slotDate.toDateString()
+        },
+        {
+          received: data => {
+            setBookedSlots(slots => ({ ...slots, ...data.slots }));
+          }
+        }
+      );
+    }
+  }, [cable, slotDate]);
 
   useEffect(() => {
     if (slotDate) {

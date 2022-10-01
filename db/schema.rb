@@ -10,12 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_09_28_055421) do
+ActiveRecord::Schema[7.0].define(version: 2022_10_01_054136) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "slots", force: :cascade do |t|
     t.datetime "start_time", null: false
     t.datetime "end_time", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["end_time"], name: "index_slots_on_end_time", unique: true
+    t.index ["start_time"], name: "index_slots_on_start_time", unique: true
   end
 
 end

@@ -7,9 +7,12 @@ class SlotsController < ApplicationController
     start_time = Date.parse(params[:date]).beginning_of_day.change(hour: params[:hour], min: params[:mins])
     slot = Slot.create!(start_time: start_time, end_time: start_time + params[:duration].minutes)
 
+    booked_slots = BookedSlotsService.new.slots_within(slot, params[:interval_mins].to_i)
+    ActionCable.server.broadcast("slot_date_#{slot.start_time.to_date}", { slots: booked_slots })
+
     render(
       status: :created,
-      json: { slots: BookedSlotsService.new.slots_within(slot, params[:interval_mins].to_i) }
+      json: { slots: booked_slots }
     )
   end
 

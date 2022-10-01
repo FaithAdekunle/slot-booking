@@ -55,8 +55,9 @@ export const getAvailableSlots = (slotDuration, bookedSlots) => {
   const day = date.getUTCDate();
   let endDate = addIntervalMinutes(date, slotDuration);
 
-  while (date.getUTCDate() == day && endDate.getUTCDate() == day) {
+  while (endDate.getUTCDate() == day) {
     endDate = addIntervalMinutes(date, slotDuration);
+
     if (slotIsAvailable(date, slotDuration, bookedSlots)) {
       availableSlots.push({
         value: date.getTime(),
