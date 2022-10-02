@@ -72,3 +72,7 @@ export const getAvailableSlots = (slotDuration, bookedSlots) => {
 
   return availableSlots;
 };
+
+export const dropdownStyles = {
+  menu: base => ({ ...base, zIndex: 9999 })
+};

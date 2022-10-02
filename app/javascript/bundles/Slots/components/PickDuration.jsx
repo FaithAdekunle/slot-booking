@@ -2,7 +2,7 @@ import Select from "react-select";
 import PropTypes from "prop-types";
 import React, { useMemo } from "react";
 
-import { getSlotDurations } from "../../../lib/slots";
+import { getSlotDurations, dropdownStyles } from "../../../lib/slots";
 
 const PickDuration = ({ slotDuration, setSlotDuration }) => {
   const slotDurations = useMemo(() => getSlotDurations(), []);
@@ -10,8 +10,10 @@ const PickDuration = ({ slotDuration, setSlotDuration }) => {
   return (
     <Select
       value={slotDuration}
+      styles={dropdownStyles}
       options={slotDurations}
       onChange={setSlotDuration}
+      placeholder="Select duration..."
     />
   );
 };

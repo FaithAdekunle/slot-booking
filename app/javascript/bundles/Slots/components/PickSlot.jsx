@@ -8,6 +8,7 @@ const PickSlot = ({ selectedSlot, availableSlots, setSelectedSlot }) => {
       value={selectedSlot}
       options={availableSlots}
       onChange={setSelectedSlot}
+      placeholder="Select time slot..."
     />
   );
 };

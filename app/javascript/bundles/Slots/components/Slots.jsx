@@ -13,8 +13,6 @@ import PickSlot from "./PickSlot";
 import PickDuration from "./PickDuration";
 import { getAvailableSlots, INTERVAL_MINS } from "../../../lib/slots";
 
-import style from "./Slots.module.css";
-
 const Slots = () => {
   const cableSubscription = useRef();
 
@@ -81,13 +79,15 @@ const Slots = () => {
   }, [bookedSlots, slotDuration]);
 
   const instruction = useCallback(() => {
+    if (loadingBookedSlots) return "Loading available slots...";
+
     if (!slotDate && !slotDuration)
-      return "Choose day and duration of the slot you want to book";
+      return "Choose day and duration of the slot you want to book.";
 
-    if (slotDate) return "Choose the duration of the slot you want to book";
+    if (slotDate) return "Choose the duration of the slot you want to book.";
 
-    return "Choose the day of the slot you want to book";
-  }, [slotDate, slotDuration]);
+    return "Choose the day of the slot you want to book.";
+  }, [slotDate, slotDuration, loadingBookedSlots]);
 
   const bookSlot = useCallback(() => {
     if (booking) return;
@@ -105,7 +105,7 @@ const Slots = () => {
     axios
       .post("/slots", params)
       .then(data => {
-        setSelectedSlot({});
+        setSelectedSlot({ label: "Select time slot..." });
         setBookedSlots(slots => ({ ...slots, ...data.data.slots }));
       })
       .catch(error => console.log(error))
@@ -113,32 +113,53 @@ const Slots = () => {
   }, [booking, selectedSlot, slotDate, slotDuration]);
 
   return (
-    <div className="container">
-      <PickDuration
-        slotDuration={slotDuration}
-        setSlotDuration={setSlotDuration}
-      />
-      <hr />
-      <PickDay
-        slotDate={slotDate}
-        setSlotDate={setSlotDate}
-        disabled={loadingBookedSlots}
-      />
-      <hr />
-      {availableSlots ? (
-        <PickSlot
-          selectedSlot={selectedSlot}
-          availableSlots={availableSlots}
-          setSelectedSlot={setSelectedSlot}
-        />
-      ) : (
-        <p>{instruction()}</p>
-      )}
-      {selectedSlot?.value ? (
-        <button disabled={booking} onClick={bookSlot}>
-          Book slot
-        </button>
-      ) : null}
+    <div className="container h-100">
+      <div className="row d-flex h-100 justify-content-center align-items-center">
+        <div className="col-6 bg-light pt-5 border">
+          <div className="row">
+            <div className="col-6">
+              <PickDuration
+                slotDuration={slotDuration}
+                setSlotDuration={setSlotDuration}
+              />
+              <hr />
+              <PickDay
+                slotDate={slotDate}
+                setSlotDate={setSlotDate}
+                disabled={loadingBookedSlots}
+              />
+            </div>
+            <div className="col-6 pb-5">
+              <div className="row d-flex h-100 justify-content-center align-items-center border border-right-0 border-top-0 border-bottom-0">
+                <div className="container">
+                  {availableSlots ? (
+                    <PickSlot
+                      selectedSlot={selectedSlot}
+                      availableSlots={availableSlots}
+                      setSelectedSlot={setSelectedSlot}
+                    />
+                  ) : (
+                    <p>{instruction()}</p>
+                  )}
+                  {selectedSlot?.value ? (
+                    <div className="clearfix">
+                      <br />
+                      <button
+                        type="button"
+                        disabled={booking}
+                        onClick={bookSlot}
+                        className="btn btn-outline-dark float-right"
+                      >
+                        Book slot
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
