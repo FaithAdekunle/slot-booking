@@ -63,7 +63,7 @@ export const getAvailableSlots = (slotDuration, bookedSlots) => {
         value: date.getTime(),
         hour: date.getUTCHours(),
         mins: date.getUTCMinutes(),
-        label: `${timeOfDate(date)} - ${timeOfDate(endDate)}`
+        label: `${timeOfDate(date)} to ${timeOfDate(endDate)}`
       });
     }
 

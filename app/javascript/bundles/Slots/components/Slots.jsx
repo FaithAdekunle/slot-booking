@@ -21,6 +21,7 @@ const Slots = () => {
   const [bookedSlots, setBookedSlots] = useState();
   const [selectedSlot, setSelectedSlot] = useState();
   const [slotDuration, setSlotDuration] = useState();
+  const [confirmation, setConfirmation] = useState();
   const [loadingBookedSlots, setLoadingBookedSlots] = useState(false);
 
   const cable = useMemo(() => ActionCable.createConsumer("/cable"), []);
@@ -107,6 +108,11 @@ const Slots = () => {
       .then(data => {
         setSelectedSlot({ label: "Select time slot..." });
         setBookedSlots(slots => ({ ...slots, ...data.data.slots }));
+        setConfirmation(
+          `Your slot from ${
+            selectedSlot.label
+          } on ${slotDate.toDateString()} has been booked sucessfully.`
+        );
       })
       .catch(error => console.log(error))
       .finally(() => setBooking(false));
@@ -132,6 +138,7 @@ const Slots = () => {
             <div className="col-6 pb-5">
               <div className="row d-flex h-100 justify-content-center align-items-center border border-right-0 border-top-0 border-bottom-0">
                 <div className="container">
+                  <p className="text-justify">{confirmation}</p>
                   {availableSlots ? (
                     <PickSlot
                       selectedSlot={selectedSlot}
