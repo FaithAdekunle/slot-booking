@@ -15,6 +15,7 @@
 #
 class Slot < ApplicationRecord
   validates_presence_of :start_time, :end_time
+  validates_uniqueness_of :start_time, :end_time
 
   def self.seed
     Slot.delete_all
