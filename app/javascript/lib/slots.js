@@ -52,12 +52,10 @@ export const getAvailableSlots = (slotDuration, bookedSlots) => {
   let date = new Date();
   const availableSlots = [];
   date.setUTCHours(0, 0, 0, 0);
-  const day = date.getUTCDate();
+  const time = date.getTime();
   let endDate = addIntervalMinutes(date, slotDuration);
 
-  while (endDate.getUTCDate() == day) {
-    endDate = addIntervalMinutes(date, slotDuration);
-
+  while (endDate.getTime() - time <= 86400000) {
     if (slotIsAvailable(date, slotDuration, bookedSlots)) {
       availableSlots.push({
         value: date.getTime(),
@@ -68,6 +66,7 @@ export const getAvailableSlots = (slotDuration, bookedSlots) => {
     }
 
     date = addIntervalMinutes(date);
+    endDate = addIntervalMinutes(date, slotDuration);
   }
 
   return availableSlots;
