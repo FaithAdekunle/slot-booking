@@ -45,29 +45,49 @@ const Slots = () => {
         }
       })
       .then(data => {
-        const obj = {};
         setBookedSlots(parseBookedSlots(data.data.slots));
       })
       .catch(error => console.log(error))
       .finally(() => setLoadingBookedSlots(false));
   }, [slotDate, slotDuration, parseBookedSlots]);
 
+  const received = useCallback(
+    data => {
+      const endTime = dayjs(data.end_time).valueOf();
+      const startTime = dayjs(data.start_time).valueOf();
+      const selectedStartTime = dayjs(slotDate).valueOf();
+      const selectedEndTime = dayjs(slotDate)
+        .add(1, "day")
+        .subtract(INTERVAL_MINS, "minute")
+        .add(slotDuration.value, "minute")
+        .valueOf();
+      if (
+        (startTime >= selectedStartTime && startTime <= selectedEndTime) ||
+        (endTime >= selectedStartTime && endTime <= selectedEndTime) ||
+        (startTime <= selectedStartTime && endTime >= selectedEndTime)
+      ) {
+        setLoadingBookedSlots(true);
+      }
+    },
+    [slotDate, slotDuration]
+  );
+
   useEffect(() => {
-    if (slotDate) {
-      cableSubscription.current?.unsubscribe();
+    cableSubscription.current?.unsubscribe();
+    if (slotDate && slotDuration) {
       cableSubscription.current = cable.subscriptions.create(
         {
-          channel: "SlotDateChannel",
-          date: slotDate.toDateString()
+          channel: "SlotDateChannel"
         },
         {
-          received: data => {
-            setBookedSlots(slots => ({ ...slots, ...data.slots }));
-          }
+          received
         }
       );
     }
-  }, [cable, slotDate]);
+    return () => {
+      cableSubscription.current?.unsubscribe();
+    };
+  }, [cable, slotDate, slotDuration, received]);
 
   useEffect(() => {
     if (slotDate && slotDuration) {

@@ -13,8 +13,8 @@ class BookedSlotsService
 
   def find_booked_slots(date, duration, interval_mins)
     latest_end = date + 1.day - interval_mins.minutes + duration.minutes
-    slots = Slot.where('(start_time >= ? AND start_time < ?) OR (end_time >= ? AND end_time <= ?)', date,
-                       latest_end, date, latest_end)
+    slots = Slot.where('(start_time > ? AND start_time < ?) OR (end_time > ? AND end_time < ?) OR (start_time < ? AND end_time > ?)', date,
+                       latest_end, date, latest_end, date, latest_end)
     slots.each_with_object({}) { |slot, booked_slots| slots_within(slot, interval_mins, booked_slots) }
   end
 end
