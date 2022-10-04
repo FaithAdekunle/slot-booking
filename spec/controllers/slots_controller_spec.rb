@@ -15,17 +15,25 @@ RSpec.describe SlotsController, type: :controller do
       get :booked_slots, { params: { date: slot.start_time.to_s, interval_mins: 15 } }
       expect(response).to have_http_status(:ok)
       expect(JSON.parse(response.body)).to eq(
-        { 'slots' => { '20:0' => true, '20:15' => true, '20:30' => true, '20:45' => true, '21:0' => true, '21:15' => true, '21:30' => true, '21:45' => true,
-                       '22:0' => true, '22:15' => true } }
+        { 'slots' => { '2022-02-01 20:00:00 UTC' => '2022-02-01T20:00:00.000Z',
+                       '2022-02-01 20:15:00 UTC' => '2022-02-01T20:15:00.000Z',
+                       '2022-02-01 20:30:00 UTC' => '2022-02-01T20:30:00.000Z',
+                       '2022-02-01 20:45:00 UTC' => '2022-02-01T20:45:00.000Z',
+                       '2022-02-01 21:00:00 UTC' => '2022-02-01T21:00:00.000Z',
+                       '2022-02-01 21:15:00 UTC' => '2022-02-01T21:15:00.000Z',
+                       '2022-02-01 21:30:00 UTC' => '2022-02-01T21:30:00.000Z',
+                       '2022-02-01 21:45:00 UTC' => '2022-02-01T21:45:00.000Z',
+                       '2022-02-01 22:00:00 UTC' => '2022-02-01T22:00:00.000Z',
+                       '2022-02-01 22:15:00 UTC' => '2022-02-01T22:15:00.000Z' } }
       )
     end
   end
 
   describe 'POST create' do
     it 'returns booked slots' do
-      post :create, { params: { date: Date.current.to_s, interval_mins: 15, duration: 15, hour: 1, mins: 0 } }
+      post :create, { params: { start_time: Time.current.beginning_of_day + 1.hour, interval_mins: 15, duration: 15 } }
       expect(response).to have_http_status(:created)
-      expect(JSON.parse(response.body)).to eq({ 'slots' => { '1:0' => true } })
+      expect(JSON.parse(response.body)).to eq({ 'slots' => { '2022-10-04 01:00:00 UTC' => '2022-10-04T01:00:00.000Z' } })
     end
   end
 end
