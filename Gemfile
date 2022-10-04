@@ -72,3 +72,5 @@ group :test do
   gem "webdrivers"
 end
 gem "mini_racer", platforms: :ruby
+
+gem "byebug", "~> 11.1", :groups => [:development, :test]

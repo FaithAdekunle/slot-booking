@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useCallback
 } from "react";
+import dayjs from "dayjs";
 import axios from "axios";
 import ActionCable from "actioncable";
 
@@ -26,20 +27,30 @@ const Slots = () => {
 
   const cable = useMemo(() => ActionCable.createConsumer("/cable"), []);
 
+  const parseBookedSlots = useCallback(slots => {
+    const obj = {};
+    Object.values(slots).forEach(startTime => {
+      obj[dayjs(startTime).format("DD/MM/YYYY HH:m")] = true;
+    });
+    return obj;
+  }, []);
+
   const loadBookedSlots = useCallback(() => {
     axios
       .get("/slots/booked_slots", {
         params: {
+          date: slotDate,
           interval_mins: INTERVAL_MINS,
-          date: slotDate.toDateString()
+          duration: slotDuration.value
         }
       })
       .then(data => {
-        setBookedSlots(data.data.slots);
+        const obj = {};
+        setBookedSlots(parseBookedSlots(data.data.slots));
       })
       .catch(error => console.log(error))
       .finally(() => setLoadingBookedSlots(false));
-  }, [slotDate]);
+  }, [slotDate, slotDuration, parseBookedSlots]);
 
   useEffect(() => {
     if (slotDate) {
@@ -59,11 +70,11 @@ const Slots = () => {
   }, [cable, slotDate]);
 
   useEffect(() => {
-    if (slotDate) {
+    if (slotDate && slotDuration) {
       setBookedSlots(undefined);
       setLoadingBookedSlots(true);
     }
-  }, [slotDate]);
+  }, [slotDate, slotDuration]);
 
   useEffect(() => {
     setSelectedSlot(undefined);
@@ -75,7 +86,7 @@ const Slots = () => {
 
   const availableSlots = useMemo(() => {
     if (bookedSlots && slotDuration) {
-      return getAvailableSlots(slotDuration.value, bookedSlots);
+      return getAvailableSlots(slotDate, slotDuration.value, bookedSlots);
     }
   }, [bookedSlots, slotDuration]);
 
@@ -96,27 +107,24 @@ const Slots = () => {
     setBooking(true);
 
     const params = {
-      mins: selectedSlot.mins,
-      hour: selectedSlot.hour,
       interval_mins: INTERVAL_MINS,
       duration: slotDuration.value,
-      date: slotDate.toDateString()
+      start_time: selectedSlot.start
     };
 
     axios
       .post("/slots", params)
       .then(data => {
         setSelectedSlot({ label: "Select time slot..." });
-        setBookedSlots(slots => ({ ...slots, ...data.data.slots }));
-        setConfirmation(
-          `Your slot from ${
-            selectedSlot.label
-          } on ${slotDate.toDateString()} has been booked sucessfully.`
-        );
+        setBookedSlots(slots => ({
+          ...slots,
+          ...parseBookedSlots(data.data.slots)
+        }));
+        setConfirmation("Your slot has been booked sucessfully.");
       })
       .catch(error => console.log(error))
       .finally(() => setBooking(false));
-  }, [booking, selectedSlot, slotDate, slotDuration]);
+  }, [booking, selectedSlot, slotDate, slotDuration, parseBookedSlots]);
 
   return (
     <div className="container h-100">

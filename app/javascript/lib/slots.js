@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export const INTERVAL_MINS = 15;
 
 const minsToHours = mins => {
@@ -19,28 +21,12 @@ export const getSlotDurations = () => {
   return durations;
 };
 
-const addIntervalMinutes = (date, interval = INTERVAL_MINS) => {
-  return new Date(date.getTime() + interval * 60000);
-};
-
-const timeOfDate = date => {
-  let hour = date.getUTCHours();
-  let minute = date.getUTCMinutes();
-  minute = minute || "00";
-
-  if (hour == 12) return `${hour}:${minute}pm`;
-  if (hour < 12) return `${hour || 12}:${minute}am`;
-  return `${hour % 12}:${minute}pm`;
-};
-
 const slotIsAvailable = (date, slotDuration, bookedSlots) => {
   let interval = 0;
 
   while (interval < slotDuration) {
-    const slot = addIntervalMinutes(date, interval);
-    const hour = slot.getUTCHours();
-    const minute = slot.getUTCMinutes();
-    if (bookedSlots[`${hour}:${minute}`]) return false;
+    const slot = date.add(interval, "minute");
+    if (bookedSlots[slot.format("DD/MM/YYYY HH:m")]) return false;
 
     interval += INTERVAL_MINS;
   }
@@ -48,25 +34,21 @@ const slotIsAvailable = (date, slotDuration, bookedSlots) => {
   return true;
 };
 
-export const getAvailableSlots = (slotDuration, bookedSlots) => {
-  let date = new Date();
+export const getAvailableSlots = (slotDate, slotDuration, bookedSlots) => {
+  const date = dayjs(slotDate);
+  let nextSlotDate = dayjs(slotDate);
   const availableSlots = [];
-  date.setUTCHours(0, 0, 0, 0);
-  const time = date.getTime();
-  let endDate = addIntervalMinutes(date, slotDuration);
 
-  while (endDate.getTime() - time <= 86400000) {
-    if (slotIsAvailable(date, slotDuration, bookedSlots)) {
+  while (date.isSame(nextSlotDate, "day")) {
+    if (slotIsAvailable(nextSlotDate, slotDuration, bookedSlots)) {
       availableSlots.push({
-        value: date.getTime(),
-        hour: date.getUTCHours(),
-        mins: date.getUTCMinutes(),
-        label: `${timeOfDate(date)} to ${timeOfDate(endDate)}`
+        value: nextSlotDate.valueOf(),
+        start: nextSlotDate.toString(),
+        label: nextSlotDate.format("h:mma")
       });
     }
 
-    date = addIntervalMinutes(date);
-    endDate = addIntervalMinutes(date, slotDuration);
+    nextSlotDate = nextSlotDate.add(INTERVAL_MINS, "minute");
   }
 
   return availableSlots;
