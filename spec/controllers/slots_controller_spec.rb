@@ -31,9 +31,12 @@ RSpec.describe SlotsController, type: :controller do
 
   describe 'POST create' do
     it 'returns booked slots' do
-      post :create, { params: { start_time: Time.current.beginning_of_day + 1.hour, interval_mins: 15, duration: 15 } }
+      start_time = Time.current.beginning_of_day + 1.hour
+      res = { slots: {} }
+      res[:slots][start_time.to_s] = start_time
+      post :create, { params: { start_time: start_time, interval_mins: 15, duration: 15 } }
       expect(response).to have_http_status(:created)
-      expect(JSON.parse(response.body)).to eq({ 'slots' => { '2022-10-04 01:00:00 UTC' => '2022-10-04T01:00:00.000Z' } })
+      expect(JSON.parse(response.body)).to eq(JSON.parse(res.to_json))
     end
   end
 end

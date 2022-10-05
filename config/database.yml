@@ -18,8 +18,8 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: slot_booking
+  database: slot_booking_test
 
 production:
   <<: *default
-  database: slot_booking
+  database: slot_booking_prod
