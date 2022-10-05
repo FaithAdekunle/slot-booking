@@ -16,16 +16,14 @@
 class Slot < ApplicationRecord
   validates_presence_of :start_time, :end_time
   validates_uniqueness_of :start_time, :end_time
+  validate :validate_overlap
 
-  def self.seed
-    Slot.delete_all
-    start_time = Time.current.beginning_of_hour
-    end_time = start_time + 2.hours
-    Slot.create!(start_time: start_time, end_time: end_time)
-    new_end_time = start_time + 1.hour
-    new_start_time = start_time - 1.hour
-    Slot.create!(start_time: new_start_time, end_time: new_end_time)
-    # where('(start_time < ? AND end_time > ?)  OR (start_time < ? AND end_time > ?)', new_start_time,
-    #       new_start_time, new_end_time, new_end_time)
+  private
+
+  def validate_overlap
+    if self.class.unscoped.exists?(['(? > start_time AND ? < end_time)  OR (? > start_time AND ? < end_time) OR (? < start_time AND ? > end_time)',
+                                    start_time, start_time, end_time, end_time, start_time, end_time])
+      errors.add(:start_time, 'Overlap not allowed')
+    end
   end
 end

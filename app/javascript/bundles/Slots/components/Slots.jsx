@@ -142,7 +142,14 @@ const Slots = () => {
         }));
         setConfirmation("Your slot has been booked sucessfully.");
       })
-      .catch(error => console.log(error))
+      .catch(error => {
+        if (error.response.status === 400) {
+          setConfirmation(
+            "Sorry, this slot is no longer available. Please select another slot."
+          );
+          setSelectedSlot({ label: "Select time slot..." });
+        }
+      })
       .finally(() => setBooking(false));
   }, [booking, selectedSlot, slotDate, slotDuration, parseBookedSlots]);
 
