@@ -30,6 +30,8 @@ RSpec.describe SlotsController, type: :controller do
   end
 
   describe 'POST create' do
+    let(:slot) { create(:slot) }
+
     it 'returns booked slots' do
       start_time = Time.current.beginning_of_day + 1.hour
       res = { slots: {} }
@@ -37,6 +39,30 @@ RSpec.describe SlotsController, type: :controller do
       post :create, { params: { start_time: start_time, interval_mins: 15, duration: 15 } }
       expect(response).to have_http_status(:created)
       expect(JSON.parse(response.body)).to eq(JSON.parse(res.to_json))
+    end
+
+    it 'returns bad request for overlap slot' do
+      start_time = slot.start_time + 15.minutes
+      post :create, { params: { start_time: start_time, interval_mins: 15, duration: 15 } }
+      expect(response).to have_http_status(:bad_request)
+    end
+
+    it 'returns bad request for overlap slot' do
+      start_time = slot.start_time + 1.hour
+      post :create, { params: { start_time: start_time, interval_mins: 15, duration: 150 } }
+      expect(response).to have_http_status(:bad_request)
+    end
+
+    it 'returns bad request for overlap slot' do
+      start_time = slot.start_time - 1.hour
+      post :create, { params: { start_time: start_time, interval_mins: 15, duration: 150 } }
+      expect(response).to have_http_status(:bad_request)
+    end
+
+    it 'returns bad request for overlap slot' do
+      start_time = slot.start_time - 1.hour
+      post :create, { params: { start_time: start_time, interval_mins: 15, duration: 360 } }
+      expect(response).to have_http_status(:bad_request)
     end
   end
 end
