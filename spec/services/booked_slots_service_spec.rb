@@ -6,7 +6,6 @@ RSpec.describe BookedSlotsService, type: :model do
 
     it 'should return booked slots within slot' do
       booked_slots = BookedSlotsService.new.slots_within(slot, 15)
-      puts booked_slots
       expect(booked_slots).to eq(
         {
           '2022-02-01 20:00:00 UTC' => Time.parse('Tue, 01 Feb 2022 20:00:00.000000000 UTC +00:00'),
