@@ -2,7 +2,7 @@
 #
 # Table name: slots
 #
-#  id         :bigint           not null, primary key
+#  id         :integer          not null, primary key
 #  end_time   :datetime         not null
 #  start_time :datetime         not null
 #  created_at :datetime         not null
